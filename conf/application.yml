@@ -1,0 +1,5 @@
+service:
+  # debug | release
+  mode: debug
+  logFilePath: ./
+  logFileMaxAge: 30

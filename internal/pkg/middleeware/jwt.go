@@ -9,8 +9,8 @@ import (
 
 func JWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token, err := c.Cookie("token")
-		if err != nil {
+		token := c.GetHeader("token")
+		if token == "" {
 			panic(e.TokenIsNotExist)
 		}
 		parseToken, err := jwt.ParseToken(token)
