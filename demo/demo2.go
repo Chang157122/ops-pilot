@@ -53,21 +53,21 @@ func main() {
 
 func initParm() {
 	flag.StringVar(&sftpFilePath, "sftp", "/sftp/", "sftp文件地址")
-	flag.StringVar(&host, "host", "192.168.232.128", "sftp地址")
+	flag.StringVar(&host, "host", "127.0.0.1", "sftp地址")
 	flag.Int64Var(&port, "port", 22, "sftp 端口")
 	flag.StringVar(&username, "username", "root", "sftp 账号")
-	flag.StringVar(&password, "password", "shinemo123", "sftp 密码")
-	flag.StringVar(&mailTo, "mail", "changwenjie@shinemo.com,wangran@shinemo.com", "收件人地址")
+	flag.StringVar(&password, "password", "xxxx", "sftp 密码")
+	flag.StringVar(&mailTo, "mail", "xxx@xxx.com,xxx@xxx.com", "收件人地址")
 	flag.Parse()
 }
 
 func SendMail(mailTo []string, message string) error {
 	m := gomail.NewMessage()
-	m.SetHeader("From", m.FormatAddress("changwenjie@shinemo.com", ""))
+	m.SetHeader("From", m.FormatAddress("xxx@xxx.xxx", ""))
 	m.SetHeader("To", mailTo...)
 	m.SetHeader("Subject", "SFTP数据上报")
 	m.SetBody("text/html", message)
-	d := gomail.NewDialer("smtp.exmail.qq.com", 465, "changwenjie@shinemo.com", "wC4kCgGKBjuUjbk5")
+	d := gomail.NewDialer("smtp.exmail.qq.com", 465, "xxx@xxx.com", "xxxx")
 
 	err := d.DialAndSend(m)
 	return err
