@@ -1,150 +1,66 @@
 package log
 
 import (
-	"errors"
-	"fmt"
+	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"io"
 	"os"
-	"runtime"
-	"strings"
-)
-
-type LogLevel uint8
-type encoder uint8
-
-type Logger interface {
-	Debug(msg string)
-	Trace(msg string)
-	Info(msg string)
-	Warning(msg string)
-	Error(msg string)
-	Fatal(msg string)
-	Access(format string, args ...interface{})
-	Debugf(format string, args ...interface{})
-	Tracef(format string, args ...interface{})
-	Infof(format string, args ...interface{})
-	Warningf(format string, args ...interface{})
-	Errorf(format string, args ...interface{})
-	Fatalf(format string, args ...interface{})
-	SetPrefix(prefix string)
-	SetTimeFormat(format string)
-	SetFileInfo(level LogLevel)
-	SetEncoder(encode encoder)
-}
-
-type MaxFileCount struct {
-	FileCount    int
-	ErrFileCount int
-}
-
-//type MaxFileSize struct {
-//	Size int64
-//}
-
-//type FileAge struct {
-//	SplitFileAge int
-//	MaxFileAge int
-//}
-
-const (
-	UnKnow LogLevel = iota
-	DebugLevel
-	TraceLevel
-	InfoLevel
-	WarningLevel
-	ErrorLevel
-	AccessLevel
-	FatalLevel
-)
-
-const (
-	TextEncoder encoder = iota
-	JsonEncoder
+	"time"
 )
 
 var (
-	levels = map[LogLevel]string{
-		DebugLevel:   "Debug",
-		AccessLevel:  "Access",
-		TraceLevel:   "Trace",
-		InfoLevel:    "Info",
-		WarningLevel: "Warning",
-		ErrorLevel:   "Error",
-		FatalLevel:   "Fatal",
-	}
-	// 日志时间格式字符串
-	logTimeFormat = "2006/01/02  15:04:05.000"
-	// 是否打印文件行号信息 吗，偶人为true
-	maxChanSize = 50000
+	Logger *zap.SugaredLogger
 )
 
-func (ll LogLevel) String() string {
-	return levels[ll]
+func init() {
+	// 设置一些基本日志格式 具体含义还比较好理解，直接看zap源码也不难懂
+	encoder := zapcore.NewJSONEncoder(zapcore.EncoderConfig{
+		MessageKey:  "msg",
+		LevelKey:    "level",
+		EncodeLevel: zapcore.CapitalLevelEncoder,
+		TimeKey:     "ts",
+		EncodeTime: func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+			enc.AppendString(t.Format("2006-01-02T15:04:05"))
+		},
+		CallerKey:    "file",
+		EncodeCaller: zapcore.ShortCallerEncoder,
+		EncodeDuration: func(d time.Duration, enc zapcore.PrimitiveArrayEncoder) {
+			enc.AppendInt64(int64(d) / 1000000)
+		},
+	})
+
+	var core zapcore.Core
+
+	// 开发模式，日志输出到终端
+	//consoleEncoder := zapcore.NewJSONEncoder(zap.NewDevelopmentEncoderConfig())
+	// NewTee创建一个核心，将日志条目复制到两个或多个底层核心中。
+	core = zapcore.NewTee(
+		//zapcore.NewCore(encoder, zapcore.AddSync(appHook), level),
+		zapcore.NewCore(encoder, zapcore.Lock(os.Stdout), zap.DebugLevel),
+	)
+
+	// 创建 logger 对象
+	log := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel))
+	Logger = log.Sugar()
+
+	// 替换全局的 logger, 后续在其他包中只需使用zap.L()调用即可
+	zap.ReplaceGlobals(log)
 }
 
-func ParseLogLevel(level LogLevel) string {
-	switch level {
-	case DebugLevel:
-		return "debug"
-	case AccessLevel:
-		return "access"
-	case InfoLevel:
-		return "info"
-	case WarningLevel:
-		return "warning"
-	case ErrorLevel:
-		return "error"
-	default:
-		return "unknown"
+func getWriter(filename string) io.Writer {
+	// 生成rotatelogs的Logger 实际生成的文件名 demo.log.YYmmddHH
+	// demo.log是指向最新日志的链接
+	// 保存7天内的日志，每1小时(整点)分割一次日志
+	hook, err := rotatelogs.New(
+		filename+".%Y%m%d%H", // 没有使用go风格反人类的format格式
+		rotatelogs.WithLinkName(filename),
+		rotatelogs.WithMaxAge(time.Hour*24*30),
+		rotatelogs.WithRotationTime(time.Hour),
+	)
+
+	if err != nil {
+		panic(err)
 	}
-}
-
-func getInfo(n int) (string, error) {
-	pc, fileName, lineNo, ok := runtime.Caller(n)
-	if !ok {
-		return "", errors.New("runtime.Caller() failed\n")
-	}
-	funcName := runtime.FuncForPC(pc).Name()
-	funcName = strings.Split(funcName, ".")[1]
-	//return fmt.Sprintf("%s:%s:%d", fileName, funcName, lineNo), nil
-	return fmt.Sprintf("%s:%d", fileName, lineNo), nil
-}
-
-func New() *ConsoleLogger {
-	return NewConsoleLogger(DebugLevel)
-}
-
-func getLogFileName(fileName string) string {
-	switch fileName {
-	case "access.log":
-		return "access.log"
-	case "debug.log":
-		return "debug.log"
-	case "info.log":
-		return "info.log"
-	case "sql.log":
-		return "sql.log"
-	case "warning.log":
-		return "warning.log"
-	case "error.log":
-		return "error.log"
-	default:
-		return "unknown.log"
-	}
-}
-
-func (fl *FileLogger) getLogFileObj(level LogLevel) *os.File {
-	switch level {
-	case DebugLevel:
-		return fl.FileObj["debug"]
-	case InfoLevel:
-		return fl.FileObj["info"]
-	case WarningLevel:
-		return fl.FileObj["warning"]
-	case ErrorLevel:
-		return fl.FileObj["error"]
-	case AccessLevel:
-		return fl.FileObj["access"]
-	default:
-		return fl.FileObj["info"]
-	}
+	return hook
 }

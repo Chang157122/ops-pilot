@@ -234,10 +234,10 @@ func (fl *FileLogger) CheckFileCount() {
 	fl.lock.Lock()
 	defer fl.lock.Unlock()
 	fl.RemoveMoreMaxCountFile(loc)
-	//ticker := time.Tick(fl.CheckTime)
-	//for _ = range ticker {
-	//	fl.RemoveMoreMaxCountFile(loc)
-	//}
+	ticker := time.Tick(fl.CheckTime)
+	for _ = range ticker {
+		fl.RemoveMoreMaxCountFile(loc)
+	}
 }
 
 func (fl *FileLogger) RemoveMoreMaxCountFile(loc *time.Location) {
