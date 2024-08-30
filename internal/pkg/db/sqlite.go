@@ -5,14 +5,17 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var sqlLiteFilePath = `db`
+var (
+	sqlLiteFilePath = `db`
+	SqlLiteDB       *sql.DB
+)
 
-func InitSqlLiteDB() {
-	open, err := sql.Open("sqlite3", ":memory:")
+func init() {
+	db, err := sql.Open("sqlite3", "sqlite.db")
 	if err != nil {
 
 		panic(err)
 	}
-	defer open.Close()
 
+	SqlLiteDB = db
 }
