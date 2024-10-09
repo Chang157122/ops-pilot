@@ -7,11 +7,13 @@ import (
 
 func TestModels(t *testing.T) {
 	var loginDAO = dao.LoginDAO{
-		Username: "changwenjie",
+		Username: "12312a31",
 		Password: "123456",
 		Secret:   "123456",
 		JWTToken: "123456",
 	}
-	CreateTable()
+
 	AddLoginUser(loginDAO)
+	//model := GetOneSecret("1231231")
+	//fmt.Println(model)
 }
