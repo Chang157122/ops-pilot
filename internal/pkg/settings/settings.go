@@ -7,7 +7,11 @@ import (
 	"os"
 )
 
-var Cfg *Settings
+var (
+	Cfg      *Settings
+	UserName = "monitoring"
+	Password = "YUFkd3F1YmQkM0AhKCYjSkRIMm8="
+)
 
 func InitConfig() {
 	var CONFIG_FILE string

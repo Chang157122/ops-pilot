@@ -6,6 +6,7 @@ import (
 	"opsPilot/internal/pkg/e"
 )
 
+// MetricsController 监控指标接口
 func MetricsController(c *gin.Context) {
 	e.Success(c, ops_monitor.GetMetrics())
 }

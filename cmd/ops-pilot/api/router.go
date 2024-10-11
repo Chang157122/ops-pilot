@@ -17,5 +17,6 @@ func InitRouter() *gin.Engine {
 		V1.POST("/validateCodeLogin", login.ValidateCodeLoginController)
 		V1.POST("/registeredUser", login.RegisteredUserController)
 	}
+
 	return engine
 }

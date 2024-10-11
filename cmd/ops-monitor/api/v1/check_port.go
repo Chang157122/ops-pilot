@@ -7,6 +7,7 @@ import (
 	"opsPilot/internal/pkg/e"
 )
 
+// CheckThirdPortController 检查三方端口连通性
 func CheckThirdPortController(c *gin.Context) {
 	var (
 		req request.CheckThirdPortRequest

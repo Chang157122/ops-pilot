@@ -1,6 +1,7 @@
 package login
 
 import (
+	"errors"
 	"github.com/mojocn/base64Captcha"
 	"opsPilot/internal/common/dao"
 	"opsPilot/internal/common/request"
@@ -15,7 +16,7 @@ import (
 var (
 	digitDriver = base64Captcha.DriverDigit{
 		Height:   50,
-		Width:    150,
+		Width:    200,
 		Length:   4,   // 验证码长度
 		MaxSkew:  0.7, // 倾斜
 		DotCount: 2,   // 北京的点数越大,字体越模糊
@@ -26,6 +27,7 @@ var (
 
 type CaptchaLogin struct{}
 
+// RegisterUser 注册用户
 func (l *CaptchaLogin) RegisterUser(req request.RegisterUserRequest) string {
 
 	// 生成谷歌密钥
@@ -79,13 +81,14 @@ func (l *CaptchaLogin) ValidateCodeLogin(req request.LoginRequest) string {
 }
 
 // GetAuthenticator 获取认证密钥
-func (l *CaptchaLogin) GetAuthenticator(req request.LoginRequest) {
+func (l *CaptchaLogin) GetAuthenticator(req request.LoginRequest) string {
 	// 获取用户信息,检查是否存在密钥
 	loginDAO := models.GetLoginUser(req.Username)
 	if loginDAO.Secret == "" || len(loginDAO.Secret) == 0 {
 		// 密钥不存在
 		log.Logger.Errorf("secret is not")
-		return
+		panic(errors.New("密钥不存在"))
 	}
+	return loginDAO.Secret
 
 }

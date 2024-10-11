@@ -8,7 +8,7 @@ import (
 type LoginInterFace interface {
 	CaptchaGenerate() resp.CaptchaResp
 	ValidateCodeLogin(req request.LoginRequest) string
-	GetAuthenticator(req request.LoginRequest)
+	GetAuthenticator(req request.LoginRequest) string
 	RegisterUser(req request.RegisterUserRequest) string
 }
 
