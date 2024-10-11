@@ -7,13 +7,15 @@ import (
 )
 
 func InitRouter() *gin.Engine {
-	engine := gin.Default()
+	engine := gin.New()
 	engine.Use(middleeware.GinRecovery(true), middleeware.GinLogger())
 
 	group := engine.Group("/ops-pilot")
 	V1 := group.Group("/v1")
 	{
-		V1.GET("/captcha", login.GenerateCaptchaController)
+		V1.GET("/captcha", login.GenCaptchaController)
+		V1.POST("/validateCodeLogin", login.ValidateCodeLoginController)
+		V1.POST("/registeredUser", login.RegisteredUserController)
 	}
 	return engine
 }

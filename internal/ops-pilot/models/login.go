@@ -17,19 +17,35 @@ type AuthLogin struct {
 }
 
 // GetOneSecret 获取认证
-func GetOneSecret(username string) (LoginModel AuthLogin) {
-	db.Where("username=?", username).First(&LoginModel)
-	return
-}
+//func GetOneSecret(username string) (LoginModel AuthLogin) {
+//	db.Where("username=?", username).First(&LoginModel)
+//	return
+//}
 
 // CheckUserExists 检查用户是否存在
-func CheckUserExists(username, passwd string) bool {
+func CheckUserExists(username string) bool {
+	err := db.Where("username=?", username)
+	if err.Error != nil {
+		log.Logger.Errorf("Check user exists failed err: %v", err)
+		return false
+	}
+	return true
+}
+
+// CheckUserPasswordCorrect 检查用户密码是否正确
+func CheckUserPasswordCorrect(username, passwd string) bool {
 	err := db.Where("username=? AND password=?", username, util.StrToBase64(passwd))
 	if err.Error != nil {
 		log.Logger.Errorf("Check user exists failed err: %v", err)
 		return false
 	}
 	return true
+}
+
+// GetLoginUser 获取登录用户信息
+func GetLoginUser(username string) (LoginModel AuthLogin) {
+	db.Where("username=?", username).First(&LoginModel)
+	return
 }
 
 // AddLoginUser 新增登录用户

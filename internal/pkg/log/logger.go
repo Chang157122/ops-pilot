@@ -6,6 +6,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
+	"time"
 )
 
 var Logger *zap.SugaredLogger
@@ -33,8 +34,9 @@ func InitLogger(filename, level string, maxSize, maxBackup, maxAge int) (err err
 	})
 	core := zapcore.NewCore(encoder, writeSyncer, l)
 
-	Logger := zap.New(core, zap.AddCaller())
-	zap.ReplaceGlobals(Logger) // 替换zap包中全局的logger实例，后续在其他包中只需使用zap.L()调用即可
+	log := zap.New(core, zap.AddCaller())
+	zap.ReplaceGlobals(log) // 替换zap包中全局的logger实例，后续在其他包中只需使用zap.L()调用即可
+	Logger = log.Sugar()
 	return
 }
 
@@ -44,18 +46,21 @@ func init() {
 		return lvl >= zapcore.DebugLevel
 	})
 	core := zapcore.NewCore(encoder, zapcore.AddSync(os.Stdout), debugLevel)
-	Logger := zap.New(core, zap.AddCaller())
-	zap.ReplaceGlobals(Logger)
+	log := zap.New(core, zap.AddCaller())
+	zap.ReplaceGlobals(log)
+	Logger = log.Sugar()
 }
 
 func getEncoder() zapcore.Encoder {
 	encoderConfig := zap.NewProductionEncoderConfig()
-	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	encoderConfig.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+		enc.AppendString(t.Format("2006-01-02 15:04:05"))
+	}
 	encoderConfig.TimeKey = "time"
 	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 	encoderConfig.EncodeDuration = zapcore.SecondsDurationEncoder
 	encoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
-	return zapcore.NewJSONEncoder(encoderConfig)
+	return zapcore.NewConsoleEncoder(encoderConfig)
 }
 
 func getLogWriter(filename string, maxSize, maxBackup, maxAge int) zapcore.WriteSyncer {

@@ -14,14 +14,10 @@ func TestAuthenticator(t *testing.T) {
 	fmt.Println("----------------- 信息校验----------------------")
 	var code int32
 	fmt.Print("请输入Google Code:")
-	for {
-		_, err := fmt.Scan(&code)
-		if err == nil {
-			break
-		}
 
-		fmt.Print("输入错误，请重新输入：")
-	}
+	fmt.Scan(&code)
+
+	fmt.Print("输入错误，请重新输入：")
 
 	b := VerifyCode(secret, code)
 	if b {

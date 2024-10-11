@@ -1,4 +1,4 @@
-package main
+package ops_pilot
 
 import "opsPilot/cmd/ops-pilot/api"
 

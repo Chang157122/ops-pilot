@@ -1,7 +1,7 @@
 package main
 
 import (
-	"opsPilot/cmd/watchdog/api"
+	"opsPilot/cmd/ops-monitor/api"
 )
 
 func main() {

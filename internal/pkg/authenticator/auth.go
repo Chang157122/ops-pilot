@@ -10,7 +10,8 @@ import (
 	"time"
 )
 
-func GetSecret() string {
+// GenerateSecret 生成Secret
+func GenerateSecret() string {
 	randomStr := randStr(16)
 	return strings.ToUpper(randomStr)
 }

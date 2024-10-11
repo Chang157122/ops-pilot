@@ -3,8 +3,11 @@ package models
 import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"opsPilot/internal/common/util"
 	"opsPilot/internal/pkg/log"
+	"os"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -20,10 +23,26 @@ func init() {
 	var (
 		err error
 		//dbType      = "sqlite3"
-		//dbFile      = "db/sqlite3.db"
-		tablePrefix = "t_"
+		dbFile        string
+		dbFilePathDir string // sqlite3的存放路径
+		tablePrefix   = "t_"
 	)
-	db, err = gorm.Open("sqlite3", "sqlite3.db")
+	if dbFile = os.Getenv("DB_PATH"); dbFile == "" {
+		dbFile = "sqlite3.db"
+	} else {
+		s := strings.Split(dbFile, "/")
+		// 获取数组长度
+		c := len(s)
+		for k, v := range s {
+			if c-1 == k {
+				break
+			}
+			dbFilePathDir += "/" + v
+		}
+		util.CheckDirIsExist(dbFilePathDir)
+	}
+
+	db, err = gorm.Open("sqlite3", dbFile)
 	if err != nil {
 		panic(err)
 	}

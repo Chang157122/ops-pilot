@@ -29,5 +29,7 @@ func Error(c *gin.Context, code any) {
 		c.JSON(http.StatusOK, NewNResult(Code, nil, GetMessage(Code)))
 	case error:
 		c.JSON(http.StatusOK, NewNResult(FAILED, nil, code.(string)))
+	default:
+		c.JSON(http.StatusOK, NewNResult(FAILED, nil, code.(string)))
 	}
 }
