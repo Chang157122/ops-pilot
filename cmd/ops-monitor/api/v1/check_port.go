@@ -3,8 +3,8 @@ package v1
 import (
 	"github.com/gin-gonic/gin"
 	"opsPilot/internal/common/request"
+	"opsPilot/internal/ops-monitor"
 	"opsPilot/internal/pkg/e"
-	"opsPilot/internal/watchdog"
 )
 
 func CheckThirdPortController(c *gin.Context) {
@@ -14,7 +14,7 @@ func CheckThirdPortController(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		panic(err)
 	}
-	if watchdog.CheckThirdPort(req.Host, req.Port) {
+	if ops_monitor.CheckThirdPort(req.Host, req.Port) {
 		e.IsSuccess(c)
 	}
 }

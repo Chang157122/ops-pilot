@@ -1,4 +1,4 @@
-package watchdog
+package ops_monitor
 
 import (
 	"fmt"

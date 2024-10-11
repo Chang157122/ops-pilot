@@ -2,10 +2,10 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
+	"opsPilot/internal/ops-monitor"
 	"opsPilot/internal/pkg/e"
-	"opsPilot/internal/watchdog"
 )
 
 func MetricsController(c *gin.Context) {
-	e.Success(c, watchdog.GetMetrics())
+	e.Success(c, ops_monitor.GetMetrics())
 }
