@@ -1,10 +1,10 @@
-package watchdog
+package main
 
 import (
 	"opsPilot/cmd/watchdog/api"
 )
 
-func APP() {
+func main() {
 	router := api.InitRouter()
 	if err := router.Run(":7798"); err != nil {
 		panic(err)

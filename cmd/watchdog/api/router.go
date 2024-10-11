@@ -15,6 +15,7 @@ func InitRouter() *gin.Engine {
 	V1 := group.Group("/v1")
 	{
 		V1.GET("/metrics", v1.MetricsController)
+		V1.POST("/checkThirdPort", v1.CheckThirdPortController)
 	}
 	return engine
 }

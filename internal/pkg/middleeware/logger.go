@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http/httputil"
 	"opsPilot/internal/pkg/e"
+	"opsPilot/internal/pkg/log"
 	"os"
 	"runtime/debug"
 	"strings"
@@ -15,19 +16,17 @@ import (
 // GinLogger 用于替换gin框架的Logger中间件，不传参数，直接这样写
 func GinLogger() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		//body := make(map[interface{}]interface{})
-		logger := zap.L()
 		start := time.Now()
 		path := c.Request.URL.Path
-		//c.ShouldBindJSON(&body)
-		c.Next() // 执行视图函数
-		// 视图函数执行完成，统计时间，记录日志
+		query := c.Request.URL.RawQuery
+		c.Next()
+
 		cost := time.Since(start)
-		logger.Info(path,
+		log.Logger.Info(path,
 			zap.Int("status", c.Writer.Status()),
 			zap.String("method", c.Request.Method),
 			zap.String("path", path),
-			//zap.Any("path", body),
+			zap.String("query", query),
 			zap.String("ip", c.ClientIP()),
 			zap.String("user-agent", c.Request.UserAgent()),
 			zap.String("errors", c.Errors.ByType(gin.ErrorTypePrivate).String()),
