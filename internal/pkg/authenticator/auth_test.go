@@ -8,7 +8,7 @@ import (
 func TestAuthenticator(t *testing.T) {
 
 	fmt.Println("----------------- 生成secret -------------------")
-	secret := GetSecret()
+	secret := GenerateSecret()
 	fmt.Println("secret:" + secret)
 
 	fmt.Println("----------------- 信息校验----------------------")
