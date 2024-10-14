@@ -6,5 +6,4 @@ type LoginDAO struct {
 	Email    string `json:"email"`
 	Role     string `json:"role"`
 	Secret   string `json:"Secret"`
-	JWTToken string `json:"jwt_token"`
 }

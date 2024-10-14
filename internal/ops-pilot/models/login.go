@@ -13,7 +13,6 @@ type AuthLogin struct {
 	Role     string `gorm:"role" json:"role"`
 	Email    string `gorm:"email" json:"email"`
 	Secret   string `gorm:"secret" json:"secret"`
-	JWTToken string `gorm:"jwt_token" json:"jwt_token"`
 }
 
 // GetOneSecret 获取认证
@@ -57,7 +56,6 @@ func AddLoginUser(loginDAO dao.LoginDAO) bool {
 			Email:    loginDAO.Email,
 			Role:     loginDAO.Role,
 			Secret:   loginDAO.Secret,
-			JWTToken: loginDAO.JWTToken,
 		},
 	)
 	if create.Error != nil {

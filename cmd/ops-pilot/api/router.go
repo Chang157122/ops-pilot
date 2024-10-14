@@ -17,6 +17,11 @@ func InitRouter() *gin.Engine {
 		V1.POST("/validateCodeLogin", login.ValidateCodeLoginController)
 		V1.POST("/registeredUser", login.RegisteredUserController)
 	}
+	authV1 := group.Group("v1")
+	{
+		authV1.Use(middleeware.JWT())
+		authV1.GET("/getCookie", login.GetCookieController)
+	}
 
 	return engine
 }

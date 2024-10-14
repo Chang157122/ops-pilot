@@ -2,6 +2,7 @@ package jwt
 
 import (
 	"github.com/dgrijalva/jwt-go"
+	"opsPilot/internal/pkg/log"
 	"time"
 )
 
@@ -16,7 +17,7 @@ type Claims struct {
 // GenerateToken 生成Token
 func GenerateToken(username, password string) (string, error) {
 	nowTime := time.Now()
-	expireTime := nowTime.Add(8 * time.Hour)
+	expireTime := nowTime.Add(24 * time.Hour)
 
 	claims := Claims{
 		username,
@@ -40,5 +41,6 @@ func ParseToken(token string) (*Claims, error) {
 			return claims, nil
 		}
 	}
+	log.Logger.Debugf("Token 解析失败,err: %v", err)
 	return nil, err
 }

@@ -17,9 +17,11 @@ func NewNResult(code int, data any, message string) NResult {
 
 func IsSuccess(c *gin.Context) {
 	c.JSON(http.StatusOK, NewNResult(SUCCESS, nil, GetMessage(SUCCESS)))
+	return
 }
 func Success(c *gin.Context, data any) {
 	c.JSON(http.StatusOK, NewNResult(SUCCESS, data, GetMessage(SUCCESS)))
+	return
 }
 
 func Error(c *gin.Context, code any) {
@@ -27,9 +29,14 @@ func Error(c *gin.Context, code any) {
 	case int:
 		Code := code.(int)
 		c.JSON(http.StatusOK, NewNResult(Code, nil, GetMessage(Code)))
+		return
 	case error:
-		c.JSON(http.StatusOK, NewNResult(FAILED, nil, code.(string)))
-	default:
-		c.JSON(http.StatusOK, NewNResult(FAILED, nil, code.(string)))
+		c.JSON(http.StatusOK, NewNResult(FAILED, nil, code.(error).Error()))
+		return
 	}
+}
+
+func IsError(c *gin.Context, code int, data string) {
+	c.JSON(http.StatusOK, NewNResult(code, nil, data))
+	return
 }

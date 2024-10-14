@@ -7,12 +7,6 @@ import (
 	"os"
 )
 
-var (
-	Cfg      *Settings
-	UserName = "monitoring"
-	Password = "YUFkd3F1YmQkM0AhKCYjSkRIMm8="
-)
-
 func InitConfig() {
 	var CONFIG_FILE string
 	if CONFIG_FILE = os.Getenv("CONFIG_FILE"); CONFIG_FILE == "" || len(CONFIG_FILE) == 0 {

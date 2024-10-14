@@ -9,7 +9,6 @@ import (
 	"opsPilot/internal/ops-pilot/models"
 	"opsPilot/internal/pkg/authenticator"
 	"opsPilot/internal/pkg/e"
-	"opsPilot/internal/pkg/jwt"
 	"opsPilot/internal/pkg/log"
 )
 
@@ -32,11 +31,6 @@ func (l *CaptchaLogin) RegisterUser(req request.RegisterUserRequest) string {
 
 	// 生成谷歌密钥
 	secret := authenticator.GenerateSecret()
-	token, err := jwt.GenerateToken(req.Username, req.Password)
-	if err != nil {
-		log.Logger.Errorf("generate token failure: %v", err)
-		panic(e.TokenGenerateFailure)
-	}
 
 	if !models.AddLoginUser(dao.LoginDAO{
 		Username: req.Username,
@@ -44,11 +38,11 @@ func (l *CaptchaLogin) RegisterUser(req request.RegisterUserRequest) string {
 		Email:    req.Email,
 		Role:     req.Role,
 		Secret:   secret,
-		JWTToken: token,
 	}) {
 		log.Logger.Errorf("add login user failure")
 		panic(e.RegisterUserFailure)
 	}
+	// 返回谷歌密钥,用于绑定
 	return secret
 }
 
@@ -77,6 +71,7 @@ func (l *CaptchaLogin) ValidateCodeLogin(req request.LoginRequest) string {
 	if !store.Verify("", req.Answer, true) {
 		panic(e.CaptchaVerifyFailure)
 	}
+
 	return "success"
 }
 
