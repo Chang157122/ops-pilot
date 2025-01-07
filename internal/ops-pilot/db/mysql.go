@@ -2,11 +2,9 @@ package db
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"strings"
 )
 
 type MysqlImpl struct {
@@ -15,10 +13,11 @@ type MysqlImpl struct {
 
 func (m MysqlImpl) Query(sql []byte) ([]byte, error) {
 	s := string(sql)
-	split := strings.Split(s, " ")
-	if !strings.Contains(split[0], "SELECT") || !strings.Contains(split[0], "select") {
-		panic(errors.New("查询接口不执行删除"))
-	}
+
+	//split := strings.Split(s, " ")
+	//if !strings.Contains(split[0], "SELECT") || !strings.Contains(split[0], "select") {
+	//	panic(errors.New("查询接口不执行删除"))
+	//}
 
 	rows, err := m.client.Query(s)
 	if err != nil {
@@ -34,18 +33,16 @@ func (m MysqlImpl) Query(sql []byte) ([]byte, error) {
 		scans[i] = &values[i]
 	}
 
-	results := make([]map[string]string, 0, 10)
+	results := make([][]string, 0, 10)
 	for rows.Next() {
 		err := rows.Scan(scans...)
 		if err != nil {
 			return nil, err
 		}
-
-		row := make(map[string]string, 10)
-		for k, v := range values {
-			key := cols[k]
+		row := make([]string, 0, 10)
+		for _, v := range values {
 			value := string(v)
-			row[key] = value
+			row = append(row, value)
 		}
 		results = append(results, row)
 	}

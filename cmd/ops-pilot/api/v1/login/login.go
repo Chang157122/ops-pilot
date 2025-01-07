@@ -6,13 +6,17 @@ import (
 	login2 "opsPilot/internal/ops-pilot/login"
 	"opsPilot/internal/pkg/e"
 	"opsPilot/internal/pkg/jwt"
+	"opsPilot/internal/pkg/log"
 	"opsPilot/internal/pkg/settings"
+	"time"
 )
 
 var login = login2.NewLoginInterFace()
 
 // GenCaptchaController 生成验证码
 func GenCaptchaController(c *gin.Context) {
+	time.Sleep(time.Second * 5)
+	log.Logger.Infof("start")
 	// 生成Token
 	jwtToken, err := jwt.GenerateToken("changwenjie", "shinemo123")
 	if err != nil {
@@ -26,6 +30,7 @@ func GenCaptchaController(c *gin.Context) {
 }
 
 func GetCookieController(c *gin.Context) {
+
 	token, err := c.Cookie("ops_pilot_jwt_token")
 	if err != nil {
 		panic(e.TokenIsNotExist)

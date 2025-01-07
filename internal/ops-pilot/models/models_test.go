@@ -10,7 +10,6 @@ func TestModels(t *testing.T) {
 		Username: "12312a31",
 		Password: "123456",
 		Secret:   "123456",
-		JWTToken: "123456",
 	}
 
 	AddLoginUser(loginDAO)
